@@ -125,7 +125,7 @@ Below is a summary table of my intial data exploration:
 | 1294_S1_L008_R3_001.fastq.gz | barcode 2 | 8 | Phred+33 |
 | 1294_S1_L008_R4_001.fastq.gz | reverse read | 101 | Phred+33 |
 
-Now I need to write a Python script to graph the distribution of quality scores for each file. This script is called ```
+Now I need to write a Python script to graph the distribution of quality scores for each file. This script is called ```qual_dist.py```. I added my bioinfo.py to this repo as well so I can utilize the functions in my script.
 
 
 
