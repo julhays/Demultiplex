@@ -115,3 +115,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# error and output
+*.out
+*.err
