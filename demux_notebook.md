@@ -192,12 +192,20 @@ There are 3976613 index 1 barcodes with an N and 3328051 index 2 barcodes with a
 
 Questions:
 * It is now occuring to be that I made a scatterplot and not a histogram, but I think the scatterplot looks better. I need to ask if this is ok.
+
+yes
+
 * 30 reasonable cutoff
+
+idk... use hamming distance and probabilities
+
 * sum the N indicies or report both files (if both barcodes for a certain sample have N, would this count as 1 or 2)
+
+each file is good
 
 I need to record my answers in ```Answers.md```.
 
-### Part 2
+### Part 2 - Write Pseudocode to Demultiplex the Files
 
 1. Define the problem
 
@@ -308,6 +316,14 @@ Expected output: True
 
 ```
 
+7/29/24 update: Pseudocode feedback
+* change the `while open R1....` to `with open ...`
+* add a command line input for q score cutoff
+* check if reverse complement of R3 in the index list, not just R3
+* statistics are calculated wrong, I need to count the occurance of each possible pair of indexes
+* only need to rev comp R3
+
+
 NOTES:
 
 check other things first then check if complementary (not in list or have N)
@@ -323,7 +339,39 @@ R2 will match lists of indexes, R3 will be rev complement
 
 
 ---
-### 7/26/24
+### 7/27/24
+### Assignment the Second
+Goal: write feedback to others about their pseudocode
+
+I wrote pseudocode feedback to my assigned people. Here is the feedback that I wrote:
+
+```
+Bendycar:
+Hi Ben,
+
+Your flowchart is easy to follow and your algorithm makes sense. I like how you included a schematic of how the sample sequences were obtained and the desired output files in the top right corner. One minor thing your algorithm is missing is a way to report the statistics like the number of read-pairs with properly matched and hopped indexes and the number of read-pairs with unknown index(es), but that should be an easy addition. Your functions all seem reasonable and helpful for this algorithm. Adding some more detail to your proposed functions such as what the inputs and outputs would be and a description of what the function does would also make this easier for a reviewer to understand and easier for you to code up later. Overall, this seems like a solid plan and I hope coding this up goes smoothly!
+
+-Jules
+
+graceHach:
+Hi Grace,
+
+Your logic is easy to follow and your algorithm makes sense. I like the dictionary system you described to keep track of the statistics for the number of read-pairs for each index pair. I believe your algorithm meets all the requirements outlined in the assignment description. I'm a little confused about the purpose of having a dictionary that holds the status of if a file is open of not - I think you could append each new entry onto the file after each iteration of the loop but maybe I am missing something. One thing that you could do to improve and simplify your algorithm is separate some of the aspects of this code into functions, such as computing the reverse compliment or creating the new header, but this is not entirely necessary. It's also redundant to have a check for both if N is in the index and if the index is in the valid set of 24 because if the index does contain an N it won't be in the set of 24. Overall, this seems like a solid plan and I hope coding this up goes smoothly!
+
+-Jules
+
+claire-j-wells:
+Hi Claire,
+
+Your logic is easy to follow and your algorithm makes sense. I like how clear your problem and outputs descriptions are because they give a lot of context to better understand your pseudocode. One minor thing your algorithm is missing is a way to report the statistics like the number of read-pairs with properly matched and hopped indexes and the number of read-pairs with unknown index(es), but that should be an easy addition. Also, what happens to records that make it to step 8 but don't pass the quality threshold? Your functions all seem reasonable and helpful for this algorithm. For the index_seq_to_header(), you might consider just outputting each individual header and then writing that header as you make the output file, rather than outputting new files with new headers. For your write_record_to_file function, you mentioned you weren't sure what the output would be. I think what you currently have (an empty return statement) is appropriate because the body of the function is writing to your file, so there would be no need to return anything after that. Overall, this seems like a solid plan and I hope coding this up goes smoothly!
+
+-Jules
+```
+
+7/29/24 update: Grace responded to my feedback and explained why she wrote a dictionary to open and keep track of file handles for writing and close them after. Lesley also mentioned that reopening and appending to files would be slow. I think I am going to implement Grace's strategy into my own code because I was just planning to append before.
+
+---
+### 7/30/24
 ### Still Part 1 :confused:
 
 I need to write my unit test files :rage:
@@ -350,12 +398,12 @@ TCGGATTC_TCGGATTC_R2.fastq
 unknown_R1.fastq
 unknown_R2.fastq
 ```
-
 When I get my assignment the third code working, I will compare my outputs to these files before running the main file.
 
-
+--- 
 ### 8/1/24
 ### Assignment the Third
+Goal: code up my pseudocode to make a working script
 
 Ok time to code.
 
