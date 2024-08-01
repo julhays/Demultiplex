@@ -3,6 +3,10 @@
 ## Part 1
 1. Be sure to upload your Python script. Provide a link to it here: https://github.com/julhays/Demultiplex/blob/master/Assignment-the-first/qual_dist.py
 
+### Data exploration
+
+Table of data exploration summary:
+
 | File name | label | Read length | Phred encoding |
 |---|---|---|---|
 | 1294_S1_L008_R1_001.fastq.gz | forward read | 101 | Phred+33 |
@@ -10,11 +14,30 @@
 | 1294_S1_L008_R3_001.fastq.gz | barcode 2 | 8 | Phred+33 |
 | 1294_S1_L008_R4_001.fastq.gz | reverse read | 101 | Phred+33 |
 
+bash commands used are located in my lab notebook: https://github.com/julhays/Demultiplex/blob/master/demux_notebook.md
+
 2. Per-base NT distribution
     1. ![alt text](R1_dist.png)
     2. ![alt text](R2_dist.png)
     3. ![alt text](R3_dist.png)
     4. ![alt text](R4_dist.png)
+
+* Quality score cutoff?
+
+Based on the graphs, it looks like a good cutoff for the biological read pairs is 30 because the average is above 30 for all positions, and slightly above 30 for the lowest quality positions. Additionally, Ilumina claims that "Q30 is considered a benchmark for quality in next-generation sequencing". Finally, the quality score cutoff for downstream analysis of biological reads can be generous because aligner algorithms will throw out reads that can't be aligned.
+
+source: https://www.illumina.com/science/technology/next-generation-sequencing/plan-experiments/quality-scores.html
+
+For the index reads, it is important to consider the hamming distance between indexes. If the quality cutoff is too low, it is possible that reads could be misidentified as belonging to another sample. Since the indexes are presumably well designed, it would take a few low quality reads/mistakes for a sample to be misidentified because the minimun hamming score is likely more than a couple base pairs. Therefore, I think rather than computing a quality threshold by base position, it would be better to calculate an average quality score for the index as a whole. Then if 1 or 2 base pairs are low quality, which wouldn't be enough to cause the sample to be misidentified, the index won't be thrown out from these low reads becasue the average will balance out the outliers. If there are enough low quality reads to make it possible for a sample to be misidentified, then the average would be below the threshold and the read would be kicked out. Based on this, I think a quality score somewhere below 20 and 30 (1 in 100 or 1 in 1000 chance or error) would be reasonable becasue the chance of 1 or more bases being misidentified in an 8 base index with a 1 in 100 error is very low. Therefore, I will select my quality score cutoff for index reads to be 26 (so that reads in the 27+ illumina quality score bin will be included.)
+
+* How many indicies have N base calls?
+```
+$ for file in /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz; do zcat $file | sed -n '2~4p' | grep -c 'N'; done
+
+3976613
+3328051
+```
+There are 3976613 index 1 barcodes with an N and 3328051 index 2 barcodes with an N.
     
 ## Part 2
 1. Define the problem
@@ -36,7 +59,6 @@ The script will also output some statistics:
 * the number of read pairs with unknown indexes
 
 3. Upload your [4 input FASTQ files](../TEST-input_FASTQ) and your [>=6 expected output FASTQ files](../TEST-output_FASTQ).
-
 
 4. Pseudocode
 ```

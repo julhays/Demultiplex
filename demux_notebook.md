@@ -4,7 +4,7 @@ Jules Hays
 
 Python version: 3.12
 
-Environments used: bgmp_py312 (matplotlib 3.9.1)
+Environments used: bgmp_py312 (matplotlib 3.9.1, numpy 2.0.0)
 
 ---
 
@@ -38,7 +38,6 @@ sample  group   treatment       index   index sequence
 ```
 
 It would be very bad to copy or unzip these files so don't do it.
-
 
 ### Part 1 - Quality Score Distribution per-nucleotide
 Goal: Perform initial data exploration and plot the mean quality score at each nucletide position for each file.
@@ -77,9 +76,9 @@ $ zcat 1294_S1_L008_R4_001.fastq.gz | head -4
 ```
 The first entry in each file have nearly the name header: 
 
-@K00337:83:HJKJNBBXX:8:1101:1265:1191 X:N:0:1
+@K00337:83:HJKJNBBXX:8:1101:1265:1191 #:N:0:1
 
-But the X is replaced with the R number in the file name. So each entry number is linked across the 4 files. It also appears that matching R2 and R3s are the reverse compliment of each other.
+But the # is replaced with the R number in the file name. So each entry number is linked across the 4 files. It also appears that matching R2 and R3s are the reverse compliment of each other.
 
 Count the number of lines/records in the files:
 ```
@@ -101,7 +100,6 @@ $ zcat 1294_S1_L008_R2_001.fastq.gz | sed -n '2~4p' | awk '{print length($0)}' |
 $ zcat 1294_S1_L008_R3_001.fastq.gz | sed -n '2~4p' | awk '{print length($0)}' | uniq
 $ zcat 1294_S1_L008_R4_001.fastq.gz | sed -n '2~4p' | awk '{print length($0)}' | uniq
 ```
-
 R1 and R4 have a read length of 101 nts.
 R2 and R3 have a read length of 8 nts.
 
@@ -139,7 +137,6 @@ srun -A bgmp -p bgmp --mem=100gb -c 8 --pty bash
 conda activate bgmp_py312
 ./qual_dist.py -f /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz -n 101
 ```
-
 I made a test file that is just the first 12 lines of the R1 file and that ran through successfully.
 
 It takes a LONG TIME to run the actual files... :sob:
@@ -156,7 +153,7 @@ Submitted batch job 7638322
 $ sbatch R4_dist.sh 
 Submitted batch job 7638323
 ```
-
+---
 ### 7/26/24
 ### Still Part 1
 
@@ -173,11 +170,15 @@ My histograms are located in the ```Assignment-the-first``` directory. They have
 
 It is now occuring to be that I made a scatterplot and not a histogram, but I think the scatterplot looks better. I need to ask if this is ok.
 
+Update: scatterplots are ok :tada:
+
 * Quality score cutoff?
 
-Based on the graphs, it looks like a good cutoff for the biological read pairs is 30 because the average is above 30 for all positions, and slightly above 30 for the lowest quality positions. I think 30 is also good for the index reads.
+Based on the graphs, it looks like a good cutoff for the biological read pairs is 30 because the average is above 30 for all positions, and slightly above 30 for the lowest quality positions. Additionally, Ilumina claims that "Q30 is considered a benchmark for quality in next-generation sequencing". Finally, the quality score cutoff for downstream analysis of biological reads can be generous because aligner algorithms will throw out reads that can't be aligned.
 
-26 for index?
+source: https://www.illumina.com/science/technology/next-generation-sequencing/plan-experiments/quality-scores.html
+
+For the index reads, it is important to consider the hamming distance between indexes. If the quality cutoff is too low, it is possible that reads could be misidentified as belonging to another sample. Since the indexes are presumably well designed, it would take a few low quality reads/mistakes for a sample to be misidentified because the minimun hamming score is likely more than a couple base pairs. Therefore, I think rather than computing a quality threshold by base position, it would be better to calculate an average quality score for the index as a whole. Then if 1 or 2 base pairs are low quality, which wouldn't be enough to cause the sample to be misidentified, the index won't be thrown out from these low reads becasue the average will balance out the outliers. If there are enough low quality reads to make it possible for a sample to be misidentified, then the average would be below the threshold and the read would be kicked out. Based on this, I think a quality score somewhere below 20 and 30 (1 in 100 or 1 in 1000 chance or error) would be reasonable becasue the chance of 1 or more bases being misidentified in an 8 base index with a 1 in 100 error is very low. Therefore, I will select my quality score cutoff for index reads to be 26 (so that reads in the 27+ illumina quality score bin will be included.)
 
 * How many indicies have N base calls?
 
@@ -217,7 +218,6 @@ The script will also output some statistics:
 * the number of read pairs with unknown indexes
 
 3. Upload your [4 input FASTQ files](../TEST-input_FASTQ) and your [>=6 expected output FASTQ files](../TEST-output_FASTQ).
-
 
 4. Pseudocode
 ```
@@ -320,6 +320,53 @@ if it does pass it add R1 to file_R1.fq and R4 to file_R2.fq
 if comp, add to header
 
 R2 will match lists of indexes, R3 will be rev complement
+
+
+---
+### 7/26/24
+### Still Part 1 :confused:
+
+I need to write my unit test files :rage:
+
+I will write 4 fastq files for each of the 4 illumina output read files that will be in the ```TEST-input_FASTQ``` directory:
+```
+test_r1.fastq
+test_r2.fastq
+test_r3.fastq
+test_r4.fastq
+```
+Each file will have 3 reads that meet the following criteria:
+* one dual matched read
+* one index hopped read
+* one unknown index read
+* one low quality index read
+
+I will also include the desired output for my files, located in the ```TEST-output_FASTQ``` directory. I have 6 output files for my unit tests:
+```
+hopped_R1.fastq
+hopped_R2.fastq
+TCGGATTC_TCGGATTC_R1.fastq
+TCGGATTC_TCGGATTC_R2.fastq
+unknown_R1.fastq
+unknown_R2.fastq
+```
+
+When I get my assignment the third code working, I will compare my outputs to these files before running the main file.
+
+
+### 8/1/24
+### Assignment the Third
+
+Ok time to code.
+
+I made a python script called ```demultiplex.py``` in the ```Assigment-the-third``` directory.
+
+Part 3 notes:
+-include bar chart of reads/sample
+-add a space between the first part of header and the barcodes
+- open and close the file once
+- use itertools permutations to make all permutations of file outputs maybe?
+- only need named files for each matched pair
 
 
 
