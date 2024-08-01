@@ -76,7 +76,6 @@ unknown = 0 # integer count of the number of unknown pairs
 #while doing this keep count of the occurance of a match or mismatch for each index pair
 while read R1, R2, R3, R4 file:
     while True:
-
         extract a fastq record (4 lines) for each file and store in a list
 
         if all the lines in each file are empty:
@@ -146,5 +145,4 @@ def rev_comp(R2_seq: str, R3_seq: str) -> bool:
     return True or return False
 Input: ('GTAGCGTA', 'TACGCTAC')
 Expected output: True
-
 ```

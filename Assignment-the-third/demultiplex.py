@@ -36,7 +36,6 @@ with open(index_file, 'rt') as fh:
 #turn it into a set for faster lookups
 indexes: set = set(index_list)
 
-
 #necessary functions
 def reverse_complement(seq: str) -> str:
     '''Takes in the a DNA/RNA sequence and returns the reverse complement of that sequence 
@@ -70,12 +69,12 @@ def barcodes_to_header(R1_head: str, R4_head: str, R2_seq: str, R3_seq: str) -> 
 output_files: dict = {}   #keys are barcode, values are list of 2 file handles for R1 and R2
 #output_names = ['hopped_R1', 'hopped_R2', 'unknown_R1', 'unknown_r2']
 for barcode in indexes:
-    output_name1 = f'{barcode}_{barcode}_R1.fastq'
-    output_name2 = f'{barcode}_{barcode}_R2.fastq'
+    output_name1 = f'outputs/{barcode}_{barcode}_R1.fastq'
+    output_name2 = f'outputs/{barcode}_{barcode}_R2.fastq'
     output_files[barcode] = [open(output_name1, 'wt'), open(output_name2, 'wt')]
 
-output_files['hopped'] = [open('hopped_R1.fastq', 'wt'), open('hopped_R2.fastq', 'wt')]
-output_files['unknown'] = [open('unknown_R1.fastq', 'wt'), open('unknown_R2.fastq', 'wt')]
+output_files['hopped'] = [open('outputs/hopped_R1.fastq', 'wt'), open('outputs/hopped_R2.fastq', 'wt')]
+output_files['unknown'] = [open('outputs/unknown_R1.fastq', 'wt'), open('outputs/unknown_R2.fastq', 'wt')]
 
 
 #open all the read files

@@ -405,7 +405,7 @@ When I get my assignment the third code working, I will compare my outputs to th
 ### Assignment the Third
 Goal: code up my pseudocode to make a working script
 
-Ok time to code.
+Ok time to code. :fearful:
 
 I made a python script called ```demultiplex.py``` in the ```Assigment-the-third``` directory.
 
