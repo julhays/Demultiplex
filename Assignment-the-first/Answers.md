@@ -37,7 +37,7 @@ $ for file in /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz
 3976613
 3328051
 ```
-There are 3976613 index 1 barcodes with an N and 3328051 index 2 barcodes with an N.
+There are 3976613 index 1 barcodes with an N and 3328051 index 2 barcodes with an N., for a total of 7304664 indexes with N.
     
 ## Part 2
 1. Define the problem
