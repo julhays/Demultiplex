@@ -409,6 +409,21 @@ Ok time to code. :fearful:
 
 I made a python script called ```demultiplex.py``` in the ```Assigment-the-third``` directory.
 
+Ok so I got the test file to run through, and the output matches the expected unit test output.
+
+I also had my script create a summary of the results called ```demux_stats.txt```.
+
+I then tested the script on a file that was 100,000 records long and it took about .63 seconds to run. Lets calculate the total run time:
+
+363,246,735 records/100000 records * 0.63s / 60s/min / 60min/hr = 0.635
+
+It should take a little over a half hour to run. I am going to make a sbatch script to run this called ```run_demux.sh```.
+
+Time to runnnnnnnnnnnnnnnnnnn
+
+
+
+
 Part 3 notes:
 -include bar chart of reads/sample
 -add a space between the first part of header and the barcodes
