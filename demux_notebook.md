@@ -417,16 +417,50 @@ I then tested the script on a file that was 100,000 records long and it took abo
 
 363,246,735 records/100000 records * 0.63s / 60s/min / 60min/hr = 0.635
 
-It should take a little over a half hour to run. I am going to make a sbatch script to run this called ```run_demux.sh```.
+It should take a little over a half hour to run. I am going to make a sbatch script to run this called ```run_demux.sh```. It contains the following:
+
+```
+conda activate bgmp_py312
+/usr/bin/time -v ./demultiplex.py
+```
 
 Time to runnnnnnnnnnnnnnnnnnn
 
+```
+sbatch run_demux.sh
+Submitted batch job 7827370
+```
 
+---
+### 8/3/24
+### Assignment the Third
+
+It worked!!!!!
+
+JobId: 7827370
+Runtime: 1 hour 15 mins
+% CPU: 86%
+
+The output is a file called ```demux_stats.txt``` which has all the statistics. And all the output files are in the ```outputs``` directory inside of ```Assignment-the-third```
+
+But I realized I didn't calculate all the statistics. I need to add the percentage of reads from each sample and a figure. I will go add that.
+
+Now, the script will output a file called ```demux_stats.txt``` with the statistics, and a graph called ```demux_stats.png``` that shows the percentage of the total reads that each sample contributes.
+
+I am going to run the big boy files again through my script now that I have refined the script and added to my statistics output.
+
+```
+sbatch run_demux.sh
+Submitted batch job 7892931
+```
+JobId: 7892931
+Runtime: 1 hour 15 mins
+% CPU: 86%
 
 
 Part 3 notes:
--include bar chart of reads/sample
--add a space between the first part of header and the barcodes
+- include bar chart of reads/sample
+- add a space between the first part of header and the barcodes
 - open and close the file once
 - use itertools permutations to make all permutations of file outputs maybe?
 - only need named files for each matched pair
