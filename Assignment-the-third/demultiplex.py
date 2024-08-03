@@ -38,10 +38,10 @@ index_file: str = args.index
 # r4_path = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/Assignment-the-third/r4_test.fq'
 
 
-# r1_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R1.fastq'
-# r2_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R2.fastq'
-# r3_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R3.fastq'
-# r4_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R4.fastq'
+r1_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R1.fastq'
+r2_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R2.fastq'
+r3_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R3.fastq'
+r4_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R4.fastq'
 
 #r1_path: str = '/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz'
 #r2_path: str = '/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz'
@@ -119,7 +119,8 @@ output_files['hopped'] = [open('outputs/hopped_R1.fastq', 'wt'), open('outputs/h
 output_files['unknown'] = [open('outputs/unknown_R1.fastq', 'wt'), open('outputs/unknown_R2.fastq', 'wt')]
 
 #open all the read files
-with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r3_path, "rt") as r3, gzip.open(r4_path, "rt") as r4:
+with open(r1_path, "rt") as r1, open(r2_path, "rt") as r2, open(r3_path, "rt") as r3, open(r4_path, "rt") as r4:
+#with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r3_path, "rt") as r3, gzip.open(r4_path, "rt") as r4:
     while True:
         #isolate a record from each file
         r1_lines = []
@@ -142,10 +143,11 @@ with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r
         #add indexes to headers
         r1_lines[0], r4_lines[0] = barcodes_to_header(r1_lines[0], r4_lines[0], r2_index, r3_index)
 
+        r1_out = f'{r1_lines[0]}\n{r1_lines[1]}\n{r1_lines[2]}\n{r1_lines[3]}\n'
+        r2_out = f'{r4_lines[0]}\n{r4_lines[1]}\n{r4_lines[2]}\n{r4_lines[3]}\n'
+
         #check if the indexes exist in the set of valid indexes
         if (r2_index not in indexes) or (r3_index not in indexes):
-            r1_out = f'{r1_lines[0]}\n{r1_lines[1]}\n{r1_lines[2]}\n{r1_lines[3]}\n'
-            r2_out = f'{r4_lines[0]}\n{r4_lines[1]}\n{r4_lines[2]}\n{r4_lines[3]}\n'
             output_files['unknown'][0].write(r1_out)
             output_files['unknown'][1].write(r2_out)
             unknown += 1
@@ -153,8 +155,6 @@ with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r
 
         #check if indexes are good quality
         if not good_qual(r2_lines[3], r3_lines[3], 26):
-            r1_out = f'{r1_lines[0]}\n{r1_lines[1]}\n{r1_lines[2]}\n{r1_lines[3]}\n'
-            r2_out = f'{r4_lines[0]}\n{r4_lines[1]}\n{r4_lines[2]}\n{r4_lines[3]}\n'
             output_files['unknown'][0].write(r1_out)
             output_files['unknown'][1].write(r2_out)
             unknown += 1
@@ -162,8 +162,6 @@ with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r
 
         #check if indexes match
         if r2_index == r3_index:
-            r1_out = f'{r1_lines[0]}\n{r1_lines[1]}\n{r1_lines[2]}\n{r1_lines[3]}\n'
-            r2_out = f'{r4_lines[0]}\n{r4_lines[1]}\n{r4_lines[2]}\n{r4_lines[3]}\n'
             output_files[r2_index][0].write(r1_out)
             output_files[r2_index][1].write(r2_out)
             matched_pairs[(r2_index, r3_index)] += 1
@@ -171,8 +169,6 @@ with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r
 
 
         elif r2_index != r3_index:
-            r1_out = f'{r1_lines[0]}\n{r1_lines[1]}\n{r1_lines[2]}\n{r1_lines[3]}\n'
-            r2_out = f'{r4_lines[0]}\n{r4_lines[1]}\n{r4_lines[2]}\n{r4_lines[3]}\n'
             output_files['hopped'][0].write(r1_out)
             output_files['hopped'][1].write(r2_out)
             hopped_pairs[(r2_index, r3_index)] += 1
