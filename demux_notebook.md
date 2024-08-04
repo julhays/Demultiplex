@@ -451,11 +451,15 @@ I am going to run the big boy files again through my script now that I have refi
 
 ```
 sbatch run_demux.sh
-Submitted batch job 7892931
+Submitted batch job 7892950
 ```
-JobId: 7892931
-Runtime: 1 hour 15 mins
+JobId: 7892950
+Runtime: 1 hour 25 mins
 % CPU: 86%
+
+IT WORKED!!!
+
+My graph looks good. The stats are complete now. Time to submit.
 
 
 Part 3 notes:

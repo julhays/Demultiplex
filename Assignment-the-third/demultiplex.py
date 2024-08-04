@@ -34,10 +34,10 @@ index_file: str = args.index
 #hard code paths for test files
 # index_file: str = '/projects/bgmp/shared/2017_sequencing/indexes.txt'
 
-r1_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R1.fastq'
-r2_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R2.fastq'
-r3_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R3.fastq'
-r4_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R4.fastq'
+# r1_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R1.fastq'
+# r2_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R2.fastq'
+# r3_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R3.fastq'
+# r4_path: str = '/projects/bgmp/jkhay/bioinfo/Bi622/Demultiplex/TEST-input_FASTQ/test_R4.fastq'
 
 #r1_path: str = '/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz'
 #r2_path: str = '/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz'
@@ -121,8 +121,8 @@ output_files['hopped'] = [open('outputs/hopped_R1.fastq', 'wt'), open('outputs/h
 output_files['unknown'] = [open('outputs/unknown_R1.fastq', 'wt'), open('outputs/unknown_R2.fastq', 'wt')]
 
 #open all the read files
-with open(r1_path, "rt") as r1, open(r2_path, "rt") as r2, open(r3_path, "rt") as r3, open(r4_path, "rt") as r4:
-#with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r3_path, "rt") as r3, gzip.open(r4_path, "rt") as r4:
+#with open(r1_path, "rt") as r1, open(r2_path, "rt") as r2, open(r3_path, "rt") as r3, open(r4_path, "rt") as r4:
+with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r3_path, "rt") as r3, gzip.open(r4_path, "rt") as r4:
     while True:
         #create an empty list to store the record from each file in
         r1_lines = []
