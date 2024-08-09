@@ -461,6 +461,13 @@ IT WORKED!!!
 
 My graph looks good. The stats are complete now. Time to submit.
 
+Here is a summary of my demultiplexing:
+```
+Percent of matched reads: 88.59116022061423%
+Percent of hopped reads (amount of index swapping): 0.16397807402178027%
+Percent of unknown reads: 11.244861705363986%
+```
+
 
 Part 3 notes:
 - include bar chart of reads/sample
