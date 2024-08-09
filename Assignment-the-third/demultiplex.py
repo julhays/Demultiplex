@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 
 # ADD ARGPARSE
 #define arg inputs, defaults are for the actual files we are demultiplexing for this assignment
+#making the files for this specific assignment the default for ease of use
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Establish criteria for k-merizing fastq data")
     parser.add_argument("-r1", "--R1", help="Specify the R1 file", type=str, default ='/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz')
@@ -45,6 +46,7 @@ index_file: str = args.index
 #r4_path: str = '/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz'
 
 
+#INDEX LIST
 # make list of acceptable indexes from the indexes file
 index_list: list = []
 
@@ -58,7 +60,8 @@ with open(index_file, 'rt') as fh:
 #turn it into a set for faster lookups
 indexes: set = set(index_list)
 
-#set up for statistics
+
+#SET UP FOR STATISTICS
 # make a dictionary to store all permutations of 2 indexes from the index list
 # start at 0, as reads are assigned to files it will update the number of occurances 
 matched_pairs = {}  #key = tuple of matched index pair, value = number of occurances in the files
@@ -80,7 +83,8 @@ unknown = 0
 #set a counter to keep track of number of reads
 read_count = 0
 
-#necessary functions
+
+#DEFINE NECESSARY FUNCTIONS
 def reverse_complement(seq: str) -> str:
     '''Takes in the a DNA/RNA sequence and returns the reverse complement of that sequence 
     written 5' -> 3' '''
@@ -107,7 +111,8 @@ def barcodes_to_header(R1_head: str, R4_head: str, R2_seq: str, R3_seq: str) -> 
     new_header_2 = f'{R4_head} {R2_seq}-{R3_seq}'
     return new_header_1, new_header_2
 
-#make and open all the write files
+
+#OPEN OUPUT FILES
 output_files: dict = {}   #keys are barcode, values are list of 2 file handles for R1 and R2
 #output_names = ['hopped_R1', 'hopped_R2', 'unknown_R1', 'unknown_r2']
 for barcode in indexes:
@@ -120,8 +125,9 @@ for barcode in indexes:
 output_files['hopped'] = [open('outputs/hopped_R1.fastq', 'wt'), open('outputs/hopped_R2.fastq', 'wt')]
 output_files['unknown'] = [open('outputs/unknown_R1.fastq', 'wt'), open('outputs/unknown_R2.fastq', 'wt')]
 
-#open all the read files
-#with open(r1_path, "rt") as r1, open(r2_path, "rt") as r2, open(r3_path, "rt") as r3, open(r4_path, "rt") as r4:
+
+#READ INPUT FILES
+#with open(r1_path, "rt") as r1, open(r2_path, "rt") as r2, open(r3_path, "rt") as r3, open(r4_path, "rt") as r4:   #code for the unziped unit test files
 with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r3_path, "rt") as r3, gzip.open(r4_path, "rt") as r4:
     while True:
         #create an empty list to store the record from each file in
@@ -154,27 +160,28 @@ with gzip.open(r1_path, "rt") as r1, gzip.open(r2_path, "rt") as r2, gzip.open(r
         r1_out = f'{r1_lines[0]}\n{r1_lines[1]}\n{r1_lines[2]}\n{r1_lines[3]}\n'
         r2_out = f'{r4_lines[0]}\n{r4_lines[1]}\n{r4_lines[2]}\n{r4_lines[3]}\n'
 
-        #check if the indexes exist in the set of valid indexes
+        #check if the indexes exist in the set of valid indexes, if not add to unknown
         if (r2_index not in indexes) or (r3_index not in indexes):
             output_files['unknown'][0].write(r1_out) #write to the file
             output_files['unknown'][1].write(r2_out)
             unknown += 1
             continue #go back to the top of the while loop
 
-        #check if indexes are good quality
+        #check if indexes are good quality, if not add to unknown
         if not good_qual(r2_lines[3], r3_lines[3], 26):
             output_files['unknown'][0].write(r1_out)
             output_files['unknown'][1].write(r2_out)
             unknown += 1
             continue
 
-        #check if indexes match
+        #check if indexes match, if match add to respecive index based file name
         if r2_index == r3_index:
             output_files[r2_index][0].write(r1_out)
             output_files[r2_index][1].write(r2_out)
             matched_pairs[(r2_index, r3_index)] += 1
             matched += 1
 
+        #all other conditions should fall into hopped, write to hopped
         elif r2_index != r3_index:
             output_files['hopped'][0].write(r1_out)
             output_files['hopped'][1].write(r2_out)
@@ -190,8 +197,9 @@ for key in output_files: #loops through the dictionary to close each file
     output_files[key][0].close()
     output_files[key][1].close()
 
+#STATISTICS OUTPUT
 #output statistics into a stats file
-with open('demux_stats.txt', "wt") as stats:
+with open('results/demux_stats.txt', "wt") as stats:
     stats.write(f'Number of total reads: {read_count}\n')
     stats.write(f'Number of matched reads: {matched}\n')
     stats.write(f'Percent of matched reads: {100*matched/read_count}%\n')
@@ -221,7 +229,7 @@ plt.xlabel("Percentage of Sample in the Reads")
 plt.ylabel("Macthed Sample Index Sequence")
 plt.title("Percentage of Each Sample in Demultiplexed Reads")
 plt.tight_layout()  #the graph was cutting off the y axis label, so this makes it not do that
-plt.savefig('demux_stats.png')
+plt.savefig('results/demux_stats.png')
 plt.close()
 
 
